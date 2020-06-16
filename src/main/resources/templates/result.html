@@ -6,8 +6,17 @@
 <body>
     <h1>Metadata Search Engine</h1>
     <hr>
-    <p th:each="result: ${results}"
-       th:text="${result.getTitle()}"
-       />
+    <div class="form" align="center">
+        <form action="result.html" method="post">
+            <input class="form-control" type="text" placeholder="Search" aria-label="Search" name="query">
+            <button class="btn btn-unique btn-rounded btn-sm my-0" type="submit">Search</button>
+        </form>
+    </div>
+    <p><span th:text="${results.getNumFound()}"/> Results Found</p>
+    <p th:each="result: ${results.getMetadataResultList()}">
+        <a th:href="@{${result.getDoi()}}"><span th:text="${result.getTitle()}"/></a><br />
+        <span th:text="${result.getDescription()}"/><br />
+        <span th:text="${result.getResourceType()}"/>
+    </p>
 </body>
 </html>

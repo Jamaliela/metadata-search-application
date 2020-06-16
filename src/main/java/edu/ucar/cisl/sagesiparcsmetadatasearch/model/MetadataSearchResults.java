@@ -15,6 +15,7 @@ public class MetadataSearchResults {
     }
 
     public void setMetadataResultList(List<Metadata> metadataResultList) {
+
         this.metadataResultList = metadataResultList;
     }
 

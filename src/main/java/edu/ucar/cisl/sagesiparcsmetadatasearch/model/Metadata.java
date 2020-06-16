@@ -40,9 +40,7 @@ public class Metadata {
         this.doi = doi;
     }
 
-    public String getResourceType() {
-        return resourceType;
-    }
+    public String getResourceType() {return resourceType; }
 
     public void setResourceType(String resourceType) {
         this.resourceType = resourceType;
