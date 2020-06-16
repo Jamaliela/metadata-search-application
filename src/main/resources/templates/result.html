@@ -6,7 +6,8 @@
 <body>
     <h1>Metadata Search Engine</h1>
     <hr>
-    <p>The result is: <span th:text="${result}">No results</span></p>
-    <p>Number of results found: <span th:text="${count}">None</span></p>
+    <p th:each="result: ${results}"
+       th:text="${result.getTitle()}"
+       />
 </body>
 </html>
