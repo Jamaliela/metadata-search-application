@@ -14,9 +14,9 @@
     </div>
     <p><span th:text="${results.getNumFound()}"/> Results Found</p>
     <p th:each="result: ${results.getMetadataResultList()}">
-        <a th:href="@{${result.getDoi()}}"><span th:text="${result.getTitle()}"/></a><br />
-        <span th:text="${result.getDescription()}"/><br />
-        <span th:text="${result.getResourceType()}"/>
+        <a th:href="@{${result.getDoi()}}"><span th:if="${result.getTitle() != null}" th:text="${result.getTitle()}"/></a><br />
+        <span th:if="${result.getDescription() != null}" th:text="${result.getDescription()}"/><br />
+        <span th:if="${result.getResourceType() != null}" th:text="${result.getResourceType()}"/>
     </p>
 </body>
 </html>
