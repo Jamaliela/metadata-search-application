@@ -1,4 +1,4 @@
-package edu.ucar.cisl.sagesiparcsmetadatasearch.controller;
+package edu.ucar.cisl.sagesiparcsmetadatasearch;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;

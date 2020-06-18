@@ -1,6 +1,6 @@
 package edu.ucar.cisl.sagesiparcsmetadatasearch.repository;
 
-import edu.ucar.cisl.sagesiparcsmetadatasearch.controller.MetadataSearchConfig;
+import edu.ucar.cisl.sagesiparcsmetadatasearch.MetadataSearchConfig;
 import edu.ucar.cisl.sagesiparcsmetadatasearch.model.Metadata;
 import edu.ucar.cisl.sagesiparcsmetadatasearch.model.MetadataSearchResults;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -35,7 +35,8 @@ public class MetadataSearchRepository {
 
         try {
 
-            metadataSearchResults = tryGetQueryResults(queryText);
+            SolrDocumentList solrDocumentList = tryGetQueryResults(queryText);
+            metadataSearchResults = createMetadataSearchResults(solrDocumentList);
 
         } catch (Exception e) {
 
@@ -44,16 +45,22 @@ public class MetadataSearchRepository {
 
         return metadataSearchResults;
     }
-    private MetadataSearchResults tryGetQueryResults(String queryText) throws IOException, SolrServerException {
 
-        MetadataSearchResults metadataSearchResults = new MetadataSearchResults();
+    private SolrDocumentList tryGetQueryResults(String queryText) throws IOException, SolrServerException {
+
         SolrQuery query = new SolrQuery();
         query.setQuery(queryText);
         query.setRows(10000);
         QueryResponse response = this.metadataSearchConfig.getSolrClient(this.solrUrl).query(query);
-        SolrDocumentList results = response.getResults();
-        metadataSearchResults.setNumFound(results.getNumFound());
-        List<Metadata> metadataList = setMetadataResults(results);
+
+        return response.getResults();
+    }
+
+    private MetadataSearchResults createMetadataSearchResults(SolrDocumentList solrDocumentList) {
+
+        MetadataSearchResults metadataSearchResults = new MetadataSearchResults();
+        metadataSearchResults.setNumFound(solrDocumentList.getNumFound());
+        List<Metadata> metadataList = setMetadataResults(solrDocumentList);
         metadataSearchResults.setMetadataResultList(metadataList);
 
         return metadataSearchResults;
