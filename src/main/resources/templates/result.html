@@ -6,26 +6,43 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+    <link rel="stylesheet" th:href="@{style.css}">
     <title>Sage SIParCS Search Engine</title>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3f2fd;">
-        <a class="navbar-brand" href="#">
-            <iframe src="https://drive.google.com/file/d/1LQ274oWfSniSf48UKY7-wZOLqUV0IQgF/preview" width="640" height="480"></iframe>
-        </a>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="col-md-4">
+            <a th:class="navbar-brand" href="#">
+                <img th:class="logo" th:src="@{/images/ucarncarstack-ncarspellout-blue.png}">
+            </a>
+        </div>
+        <div class="col-md-4 offset-md-5">
+            <a th:class="navbar-brand" href="#">
+                <img th:class="logo" th:src="@{/images/NCAR-Sponsored-NSF-Gray.png}">
+            </a>
+        </div>
     </nav>
-    <h1>Metadata Search Engine</h1>
-    <hr>
-    <div class="form" align="center">
-        <form action="result.html" method="post">
-            <input class="form-control" type="text" placeholder="Search" aria-label="Search" name="query">
-            <button class="btn btn-unique btn-rounded btn-sm my-0" type="submit">Search</button>
-        </form>
+    <div class="jumbotron">
+        <h1 class="display-4">Welcome to Metadata Search Engine!</h1>
+        <p class="lead">This is a search engine to access digital assets from all NCAR/UCAR.</p>
+        <hr class="my-4">
+        <div class="row justify-content-center">
+            <div class="col-6">
+                <form action="result.html" method="post">
+                    <div class="form-group">
+                        <input class="form-control" type="search" placeholder="Search" aria-label="Search" name="query">
+                    </div>
+                    <button class="btn btn-outline-primary" type="submit">Search</button>
+                </form>
+            </div>
+        </div>
     </div>
-    <p><span th:text="${results.getNumFound()}"/> Results Found</p>
-    <p th:each="result: ${results.getMetadataResultList()}">
-        <a th:href="@{${result.getDoi()}}"><span th:if="${result.getTitle() != null}" th:text="${result.getTitle()}"/></a><br />
-        <span th:if="${result.getDescription() != null}" th:text="${result.getDescription()}"/><br />
-        <span th:if="${result.getResourceType() != null}" th:text="${result.getResourceType()}"/>
-    </p>
+    <div class="container">
+        <p class="font-weight-bold"><span th:text="${results.getNumFound()}"/> Results Found</p>
+        <p th:each="result: ${results.getMetadataResultList()}">
+            <a th:href="@{${result.getDoi()}}"><span th:if="${result.getTitle() != null}" th:text="${result.getTitle()}"/></a><br />
+            <span th:if="${result.getDescription() != null}" th:text="${result.getDescription()}"/><br />
+            <span th:if="${result.getResourceType() != null}" th:text="${result.getResourceType()}"/>
+        </p>
+    </div>
 </body>
 </html>
