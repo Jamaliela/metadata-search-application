@@ -2,8 +2,8 @@ package edu.ucar.cisl.sagesiparcsmetadatasearch.controller;
 
 import edu.ucar.cisl.sagesiparcsmetadatasearch.repository.MetadataSearchRepository;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -16,16 +16,18 @@ public class MetadataSearchController {
         this.metadataSearchRepository = metadataSearchRepository;
     }
 
-    @RequestMapping("/")
+    @RequestMapping(value = "/search.html", method = RequestMethod.GET)
     public String SearchHomePage() {
-        return "SearchHomePage";
+
+        return "index";
     }
 
-    @PostMapping("/result.html")
-    public ModelAndView results(@RequestParam("query") String query) {
+    @RequestMapping(value = "/search.html", params = "q", method = RequestMethod.GET)
+    public ModelAndView results(@RequestParam("q") String query) {
 
-        ModelAndView modelAndView = new ModelAndView("result");
+        ModelAndView modelAndView = new ModelAndView("search");
         modelAndView.addObject("results", this.metadataSearchRepository.getQueryResults(query));
+        modelAndView.addObject("query", query);
         return modelAndView;
     }
 }
