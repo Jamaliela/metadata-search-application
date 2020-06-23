@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 
 @Controller
 public class MetadataSearchController {
@@ -14,6 +15,12 @@ public class MetadataSearchController {
 
     public MetadataSearchController(MetadataSearchRepository metadataSearchRepository) {
         this.metadataSearchRepository = metadataSearchRepository;
+    }
+
+    @RequestMapping("/")
+    public String index() {
+
+        return "redirect:/search.html";
     }
 
     @RequestMapping(value = "/search.html", method = RequestMethod.GET)
