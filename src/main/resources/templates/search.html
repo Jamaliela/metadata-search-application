@@ -39,8 +39,6 @@
         <p class="font-weight-bold"><span th:text="${results.getNumFound()}"/> Results Found</p>
         <p th:each="result: ${results.getMetadataResultList()}">
             <a th:href="@{${result.getDoi()}}"><span th:if="${result.getTitle() != null}" th:text="${#strings.abbreviate(result.getTitle(),63)}"/></a><br />
-<!--            <span th:if="${result.getDescription() != null}" th:utext="${#strings.abbreviate(result.getDescription(),300)}"/>-->
-<!--            <span th:unless="${result.getDescription() != null}" th:utext="${#strings.abbreviate(result.getDescriptionHighlighted(),300)}"/><br />-->
             <span th:if="${result.getDescription() != null}" th:text="${#strings.abbreviate(result.getDescription(),300)}"/><br />
             <span th:if="${result.getResourceType() != null}" th:text="${result.getResourceType()}"/>
         </p>

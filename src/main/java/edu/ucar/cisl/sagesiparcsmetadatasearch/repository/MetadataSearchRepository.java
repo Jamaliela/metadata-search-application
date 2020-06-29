@@ -12,11 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.management.Query;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Component
 public class MetadataSearchRepository {
@@ -37,8 +35,8 @@ public class MetadataSearchRepository {
 
         try {
 
-            SolrDocumentList solrDocumentList = tryGetQueryResults(queryText).getResults();
-            metadataSearchResults = createMetadataSearchResults(solrDocumentList, queryText);
+            SolrDocumentList solrDocumentList = tryGetQueryResults(queryText);
+            metadataSearchResults = createMetadataSearchResults(solrDocumentList);
 
         } catch (Exception e) {
 
@@ -48,50 +46,33 @@ public class MetadataSearchRepository {
         return metadataSearchResults;
     }
 
-    private QueryResponse tryGetQueryResults(String queryText) throws IOException, SolrServerException {
+    private SolrDocumentList tryGetQueryResults(String queryText) throws IOException, SolrServerException {
 
         SolrQuery query = new SolrQuery();
         query.setQuery(queryText);
         query.setRows(10000);
-        query.setHighlight(true).setHighlightSnippets(1);
-        query.setParam("hl.fl", "description");
-//        query.setParam("hl.fragsize", "0");
-        query.setParam("hl.simple.pre", "<strong>");
-        query.setParam("hl.simple.post", "</strong>");
         QueryResponse response = this.metadataSearchConfig.getSolrClient(this.solrUrl).query(query);
-        return response;
+        return response.getResults();
     }
 
-    private MetadataSearchResults createMetadataSearchResults(SolrDocumentList solrDocumentList, String queryText) throws IOException, SolrServerException {
+    private MetadataSearchResults createMetadataSearchResults(SolrDocumentList solrDocumentList) {
 
         MetadataSearchResults metadataSearchResults = new MetadataSearchResults();
         metadataSearchResults.setNumFound(solrDocumentList.getNumFound());
-        List<Metadata> metadataList = setMetadataResults(solrDocumentList, queryText);
+        List<Metadata> metadataList = setMetadataResults(solrDocumentList);
         metadataSearchResults.setMetadataResultList(metadataList);
 
         return metadataSearchResults;
     }
 
-    private List<Metadata> setMetadataResults(SolrDocumentList results, String queryText) throws IOException, SolrServerException {
+    private List<Metadata> setMetadataResults(SolrDocumentList results) {
 
-        QueryResponse queryResponse = tryGetQueryResults(queryText);
-        Map<String, Map<String, List<String>>> highlightMap = queryResponse.getHighlighting();
         List<Metadata> metadataList = new ArrayList<>();
         for (SolrDocument result : results) {
 
             Metadata solrItem = new Metadata();
-            solrItem.setId((String) result.get("id"));
-            List<String> descriptionList = highlightMap.get(result.get("id")).get("description");
-            if (descriptionList != null && descriptionList.size()>0) {
-
-                solrItem.setDescriptionHighlighted(descriptionList.get(0));
-            }
-            else {
-
-                solrItem.setDescription((String) result.get("description"));
-            }
-            solrItem.setDescription((String) result.get("description"));
             solrItem.setTitle((String) result.get("title"));
+            solrItem.setDescription((String) result.get("description"));
             solrItem.setResourceType((String) result.get("resource_type"));
             solrItem.setDoi((String) result.get("doi"));
             metadataList.add(solrItem);
