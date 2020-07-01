@@ -1,0 +1,66 @@
+# Java Maven CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-java/ for more details
+#
+version: 2
+jobs:
+  build:
+
+    docker:
+      - image: circleci/openjdk:8u151-jdk
+
+    environment:
+      MAVEN_OPTS: -Xmx3200m
+
+    steps:
+
+      - checkout
+
+      # Build time is reduced from 6 minutes to 3 minutes when this cache is used
+      - restore_cache:
+          key: v1-cached-dependencies-{{ checksum "pom.xml" }}
+
+      - run:
+          name: "Download Dependencies"
+          command: mvn -s .circleci/settings.xml dependency:go-offline
+
+      #      - run:
+      #          name: "Unit Tests w/jacoco"
+      #          command: mvn --quiet -s .circleci/settings.xml -Dtarget=deployment test
+
+      #      - run:
+      #          name: "Static Code Analysis: checkstyle, findbugs, pmd, and cdp"
+      #          command: mvn --quiet -s .circleci/settings.xml site pmd:pmd checkstyle:checkstyle jacoco:report
+
+      - run:
+          name: "Package/Repackage and Upload to archiva.ucar.edu"
+          command: mvn --quiet -s .circleci/settings.xml -Dmaven.test.skip=true -Dtarget=spring-boot:repackage deploy
+
+      #      # Create the jar
+      #      - run:
+      #          name: "Package War"
+      #          command: mvn -Dmaven.test.skip=true -Dtarget=deployment package
+      #
+      #      # Copy the gateway war
+      #      - run:
+      #          name: "Copy the war to Artifacts directory"
+      #          command: cp ./target/*.war gateway.war
+      #
+      #      # Store the gateway war file in CircleCI build. It can be downloaded from the Artifacts tab in the build.
+      #      - store_artifacts:
+      #          name: "Store Gateway Snapshot to CircleCI 'Artifacts' Tab"
+      #          path: gateway.war
+      #          destination: gateway.war
+
+      # Gateway build time is reduced from 6 minutes to 3 minutes when this cache is used
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: v1-cached-dependencies-{{ checksum "pom.xml" }}
+
+workflows:
+  version: 2
+  gateway-workflow:
+    jobs:
+      - build:
+          context: sage

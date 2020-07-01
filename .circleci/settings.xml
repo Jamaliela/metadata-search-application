@@ -1,0 +1,9 @@
+<settings>
+    <servers>
+        <server>
+            <id>archiva.ucar.edu</id>
+            <username>${env.ARCHIVA_USER}</username>
+            <password>${env.ARCHIVA_PASS}</password>
+        </server>
+    </servers>
+</settings>
