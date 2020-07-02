@@ -6,6 +6,7 @@ import edu.ucar.cisl.sagesiparcsmetadatasearch.model.MetadataSearchResults;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,9 +41,41 @@ public class MetadataSearchRepository {
 
         } catch (Exception e) {
 
-            throw new RuntimeException(e);
+            try {
+
+                metadataSearchResults = tryGetDoiQueryResults(queryText);
+
+            } catch (Exception error) {
+
+                try {
+
+                    metadataSearchResults = tryGetQueryResultsEscaped(queryText);
+
+                } catch (Exception Error) {
+
+                    throw new RuntimeException(Error);
+                }
+            }
         }
 
+        return metadataSearchResults;
+    }
+
+    private MetadataSearchResults tryGetDoiQueryResults(String queryText) throws IOException, SolrServerException {
+
+        StringBuffer doiQuery = new StringBuffer(queryText);
+        doiQuery.insert(0, "doi:\"");
+        doiQuery.insert(doiQuery.length(),"\"");
+        SolrDocumentList solrDocumentList = tryGetQueryResults(doiQuery.toString());
+        MetadataSearchResults metadataSearchResults = createMetadataSearchResults(solrDocumentList);
+        return metadataSearchResults;
+    }
+
+    private MetadataSearchResults tryGetQueryResultsEscaped(String queryText) throws IOException, SolrServerException {
+
+        queryText = ClientUtils.escapeQueryChars(queryText);
+        SolrDocumentList solrDocumentList = tryGetQueryResults(queryText);
+        MetadataSearchResults metadataSearchResults = createMetadataSearchResults(solrDocumentList);
         return metadataSearchResults;
     }
 
@@ -53,6 +86,7 @@ public class MetadataSearchRepository {
         query.setRows(10000);
         QueryResponse response = this.metadataSearchConfig.getSolrClient(this.solrUrl).query(query);
         return response.getResults();
+
     }
 
     private MetadataSearchResults createMetadataSearchResults(SolrDocumentList solrDocumentList) {
