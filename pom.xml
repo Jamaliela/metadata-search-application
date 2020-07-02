@@ -15,6 +15,19 @@
     <name>sage-siparcs-metadata-search</name>
     <description>User Interface for Solr Index and Metadata Search</description>
 
+    <distributionManagement>
+        <repository>
+            <id>archiva.ucar.edu</id>
+            <name>archiva.ucar.edu-releases</name>
+            <url>https://archiva.ucar.edu/repository/sage-app-release</url>
+        </repository>
+        <snapshotRepository>
+            <id>archiva.ucar.edu</id>
+            <name>archiva.ucar.edu-snapshots</name>
+            <url>https://archiva.ucar.edu/repository/sage-app-snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <properties>
         <java.version>1.8</java.version>
     </properties>
