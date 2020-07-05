@@ -5,7 +5,10 @@ import edu.ucar.cisl.sagesiparcsmetadatasearch.model.Metadata;
 import edu.ucar.cisl.sagesiparcsmetadatasearch.model.MetadataSearchResults;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.request.schema.SchemaRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.response.schema.SchemaResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -16,6 +19,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class MetadataSearchRepository {
@@ -113,5 +117,21 @@ public class MetadataSearchRepository {
         }
 
         return metadataList;
+    }
+
+    private List<String> getFieldNamesFromSolrSchema() throws IOException, SolrServerException {
+
+        HttpSolrClient solrClient = new HttpSolrClient.Builder(this.solrUrl).build();
+        List<String> fieldNames = null;
+        SchemaRequest.Fields request = new SchemaRequest.Fields();
+        SchemaResponse.FieldsResponse response = request.process(solrClient);
+        List<Map<String, Object>> fields = response.getFields();
+        fieldNames = new ArrayList<String>();
+        for (int i = 0; i < fields.size(); i++) {
+
+            String value = fields.get(i).get("name").toString();
+            fieldNames.add(value);
+        }
+        return fieldNames;
     }
 }
