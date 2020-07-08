@@ -1,11 +1,10 @@
 package edu.ucar.cisl.sagesiparcsmetadatasearch.repository;
 
-import edu.ucar.cisl.sagesiparcsmetadatasearch.MetadataSearchConfig;
 import edu.ucar.cisl.sagesiparcsmetadatasearch.model.Metadata;
 import edu.ucar.cisl.sagesiparcsmetadatasearch.model.MetadataSearchResults;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.schema.SchemaRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.schema.SchemaResponse;
@@ -13,7 +12,6 @@ import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -24,14 +22,12 @@ import java.util.Map;
 @Component
 public class MetadataSearchRepository {
 
-    private MetadataSearchConfig metadataSearchConfig;
-    private String solrUrl;
+    private SolrClient solrClient;
 
     @Autowired
-    public MetadataSearchRepository(MetadataSearchConfig metadataSearchConfig, @Value("${spring.data.solr.host}") String solrUrl) {
+    public MetadataSearchRepository(SolrClient solrClient) {
 
-        this.metadataSearchConfig = metadataSearchConfig;
-        this.solrUrl = solrUrl;
+        this.solrClient = solrClient;
     }
 
     public MetadataSearchResults getQueryResults(String queryText) {
@@ -88,7 +84,7 @@ public class MetadataSearchRepository {
         SolrQuery query = new SolrQuery();
         query.setQuery(queryText);
         query.setRows(10000);
-        QueryResponse response = this.metadataSearchConfig.getSolrClient(this.solrUrl).query(query);
+        QueryResponse response = this.solrClient.query(query);
         return response.getResults();
 
     }
@@ -121,15 +117,13 @@ public class MetadataSearchRepository {
 
     private List<String> getFieldNamesFromSolrSchema() throws IOException, SolrServerException {
 
-        HttpSolrClient solrClient = new HttpSolrClient.Builder(this.solrUrl).build();
-        List<String> fieldNames = null;
         SchemaRequest.Fields request = new SchemaRequest.Fields();
-        SchemaResponse.FieldsResponse response = request.process(solrClient);
+        SchemaResponse.FieldsResponse response = request.process(this.solrClient);
         List<Map<String, Object>> fields = response.getFields();
-        fieldNames = new ArrayList<String>();
-        for (int i = 0; i < fields.size(); i++) {
+        List<String> fieldNames = new ArrayList<>();
+        for (Map<String, Object> map : fields) {
 
-            String value = fields.get(i).get("name").toString();
+            String value = map.get("name").toString();
             fieldNames.add(value);
         }
         return fieldNames;
