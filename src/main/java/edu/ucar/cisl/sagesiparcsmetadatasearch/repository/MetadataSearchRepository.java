@@ -3,90 +3,51 @@ package edu.ucar.cisl.sagesiparcsmetadatasearch.repository;
 import edu.ucar.cisl.sagesiparcsmetadatasearch.model.Metadata;
 import edu.ucar.cisl.sagesiparcsmetadatasearch.model.MetadataSearchResults;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.request.schema.SchemaRequest;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.client.solrj.response.schema.SchemaResponse;
-import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 @Component
 public class MetadataSearchRepository {
 
-    private SolrClient solrClient;
+    private final SolrClient solrClient;
+    private final Collection<QueryStrategy> queryStrategies;
 
     @Autowired
-    public MetadataSearchRepository(SolrClient solrClient) {
+    public MetadataSearchRepository(SolrClient solrClient, Collection<QueryStrategy> queryStrategies) {
 
         this.solrClient = solrClient;
+        this.queryStrategies = queryStrategies;
     }
 
     public MetadataSearchResults getQueryResults(String queryText) {
 
-        MetadataSearchResults metadataSearchResults;
+        SolrDocumentList solrDocumentList = null;
 
-        try {
-
-            SolrDocumentList solrDocumentList = tryGetQueryResults(queryText);
-            metadataSearchResults = createMetadataSearchResults(solrDocumentList);
-
-        } catch (Exception e) {
+        for (QueryStrategy strategy : this.queryStrategies) {
 
             try {
 
-                metadataSearchResults = tryGetDoiQueryResults(queryText);
+                solrDocumentList = strategy.query(queryText);
 
-            } catch (Exception error) {
+                if (!solrDocumentList.isEmpty()) {
 
-                try {
-
-                    metadataSearchResults = tryGetQueryResultsEscaped(queryText);
-
-                } catch (Exception Error) {
-
-                    throw new RuntimeException(Error);
+                    break;
                 }
+
+            } catch (Exception e) {
+
+                e.printStackTrace();
             }
+
         }
 
-        return metadataSearchResults;
-    }
-
-    private MetadataSearchResults tryGetDoiQueryResults(String queryText) throws IOException, SolrServerException {
-
-        StringBuffer doiQuery = new StringBuffer(queryText);
-        doiQuery.insert(0, "doi:\"");
-        doiQuery.insert(doiQuery.length(),"\"");
-        SolrDocumentList solrDocumentList = tryGetQueryResults(doiQuery.toString());
-        MetadataSearchResults metadataSearchResults = createMetadataSearchResults(solrDocumentList);
-        return metadataSearchResults;
-    }
-
-    private MetadataSearchResults tryGetQueryResultsEscaped(String queryText) throws IOException, SolrServerException {
-
-        queryText = ClientUtils.escapeQueryChars(queryText);
-        SolrDocumentList solrDocumentList = tryGetQueryResults(queryText);
-        MetadataSearchResults metadataSearchResults = createMetadataSearchResults(solrDocumentList);
-        return metadataSearchResults;
-    }
-
-    private SolrDocumentList tryGetQueryResults(String queryText) throws IOException, SolrServerException {
-
-        SolrQuery query = new SolrQuery();
-        query.setQuery(queryText);
-        query.setRows(10000);
-        QueryResponse response = this.solrClient.query(query);
-        return response.getResults();
-
+        return createMetadataSearchResults(solrDocumentList);
     }
 
     private MetadataSearchResults createMetadataSearchResults(SolrDocumentList solrDocumentList) {
@@ -113,19 +74,5 @@ public class MetadataSearchRepository {
         }
 
         return metadataList;
-    }
-
-    private List<String> getFieldNamesFromSolrSchema() throws IOException, SolrServerException {
-
-        SchemaRequest.Fields request = new SchemaRequest.Fields();
-        SchemaResponse.FieldsResponse response = request.process(this.solrClient);
-        List<Map<String, Object>> fields = response.getFields();
-        List<String> fieldNames = new ArrayList<>();
-        for (Map<String, Object> map : fields) {
-
-            String value = map.get("name").toString();
-            fieldNames.add(value);
-        }
-        return fieldNames;
     }
 }
