@@ -7,6 +7,16 @@ button {
     float: right;
 }
 
-nav{
+nav {
     background-color: #C3D7EE;
+}
+
+#footerContainer {
+    width: auto;
+    max-width: 680px;
+    padding: 0 15px;
+}
+
+.footer {
+    background-color: #f5f5f5;
 }
