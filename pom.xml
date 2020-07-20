@@ -10,7 +10,7 @@
     </parent>
     <groupId>edu.ucar.cisl</groupId>
     <artifactId>sage-siparcs-metadata-search</artifactId>
-    <version>0.0.2</version>
+    <version>0.0.3-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>sage-siparcs-metadata-search</name>
     <description>User Interface for Solr Index and Metadata Search</description>
