@@ -11,12 +11,28 @@ nav {
     background-color: #C3D7EE;
 }
 
-#footerContainer {
+#versionFooter {
     width: auto;
     max-width: 680px;
     padding: 0 15px;
+    font-family: arial, helvetica, sans-serif;
+    font-size: 14px;
 }
 
 .footer {
     background-color: #f5f5f5;
+    text-align: center;
+    font-size: 90%;
+    padding-top: 10px;
+}
+
+#orgFooter {
+    text-align: center;
+    font-size: 11px;
+    line-height: 20px;
+    font-family: arial, helvetica, sans-serif;
+}
+
+#orgFooter p {
+    margin: 0 0 10px;
 }
