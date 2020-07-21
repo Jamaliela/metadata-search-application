@@ -24,9 +24,9 @@ jobs:
           name: "Download Dependencies"
           command: mvn -s .circleci/settings.xml dependency:go-offline
 
-            - run:
-                name: "Unit Tests w/jacoco"
-                command: mvn --quiet -s .circleci/settings.xml -Dtarget=deployment test
+      - run:
+          name: "Unit Tests w/jacoco"
+          command: mvn --quiet -s .circleci/settings.xml -Dtarget=deployment test
 
       #      - run:
       #          name: "Static Code Analysis: checkstyle, findbugs, pmd, and cdp"
