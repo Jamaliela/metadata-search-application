@@ -45,36 +45,8 @@ CMD ["/usr/bin/java", "-jar", "-Dspring.config.additional-location=/usr/local/pr
 ```
 ### Docker Compose File
 
-The Docker compose file contains the details of the services that will be used to create a stack and docker config or docker secret if used. 
+For more information on how to create docker-compose.yaml files for your services follow this Github [repository](https://github.com/NCAR/sage-siparcs-docker-compose).
 
-docker-compose.yaml Example:
-```
-version: '3.8'
-
-services:
-  solr:
-    image: solr:8.5.2   ##solr-version
-    volumes:
-      - "<path-to-metadata-config-folder>:/var/solr"
-    ports:
-      - "8983:8983"     ##solr-ports
-    command:
-      - solr-precreate
-      - metadata.       ##core-name
-    
-  siparcs_search:
-    image: sage-siparcs-search  ##image-name
-    depends_on:
-      - solr
-    ports:
-      - "8080:8080"  ##application-port
-    configs:
-      - source: <docker-config-file-name>
-        target: /usr/local/properties/application.properties
-configs:
-    <docker-config-file-name>:
-      external: true
-```
 ### Properties File
 
 The application properties file (src/main/resources/application.properties) contains the spring.data.solr.host,and spring thymeleaf configuration.
