@@ -4,6 +4,10 @@ The metadata search is a [Spring MVC web framework](https://spring.io/projects/s
 
 ## Before Running
 
+### Solr
+
+For more information on how to set up your Solr instance follow this Github [repository](https://github.com/NCAR/sage-solr-vagrant.git).
+
 ### Java
 
 You need to have [OpenJDK](https://adoptopenjdk.net/index.html) 8 or later installed.
